@@ -14,9 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="SmartQueue")
+app = FastAPI(title="MEDIFLOW")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "change-this-secret"))
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+app.mount("/fav", StaticFiles(directory=str(BASE_DIR / "fav")), name="fav")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 app.include_router(auth_routes.router)

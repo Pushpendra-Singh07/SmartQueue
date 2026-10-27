@@ -1,4 +1,4 @@
-# SmartQueue
+# MEDIFLOW
 
 Hospital OPD queue system. Reception issues a token, doctors call patients in order, and admin sees who is waiting and how the day went.
 
@@ -28,7 +28,7 @@ This is not a Vite or React app. Do not deploy it with `vite build`.
 You need Python 3.10+ and MySQL.
 
 ```sql
-CREATE DATABASE smartqueue CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE MEDIFLOW CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ```bash
@@ -54,7 +54,7 @@ cp .env.example .env
 Put your MySQL password in `.env`:
 
 ```env
-DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/smartqueue
+DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/MEDIFLOW
 SECRET_KEY=replace-with-a-long-random-string
 ```
 
