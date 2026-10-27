@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue View</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>SmartQueue – Staff</div>
+        <div class="nav-links">
+            <a href="/staff/register">Register Patient</a>
+            <a class="active" href="/staff/queue">View Queue</a>
+        </div>
+        <div class="nav-user"><span class="avatar">{{ (user.full_name or "?")[:1]|upper }}</span><span class="user-name">{{ user.full_name }}</span> <a class="btn btn-sm" href="/logout">Logout</a></div>
+    </nav>
+    <main class="container">
+        <div class="page-head">
+            <div>
+                <h1>Live queues</h1>
+                <p>Choose a doctor to watch their queue in real time.</p>
+            </div>
+            <span class="chip"><span class="live-dot"></span>Live · auto-refresh</span>
+        </div>
+        <div class="form-group toolbar">
+            <label for="doctor-select">Doctor</label>
+            <select id="doctor-select">
+                {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">{{ doctor.name }}{% if doctor.department %} · {{ doctor.department.name }}{% endif %}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="queue-container" class="queue-list"><p class="loading">Loading queue…</p></div>
+    </main>
+    <script src="/static/live_queue.js"></script>
+</body>
+</html>

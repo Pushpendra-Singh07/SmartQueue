@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>SmartQueue – Admin</div>
+        <div class="nav-links">
+            <a class="active" href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/doctors">Doctors</a>
+            <a href="/admin/staff">Staff</a>
+            <a href="/admin/departments">Departments</a>
+        </div>
+        <div class="nav-user"><span class="avatar">{{ (user.full_name or "?")[:1]|upper }}</span><span class="user-name">{{ user.full_name }}</span> <a class="btn btn-sm" href="/logout">Logout</a></div>
+    </nav>
+    <main class="container">
+        <div class="page-head">
+            <div>
+                <h1>Today’s hospital picture</h1>
+                <p>Footfall, waiting time and no-shows at a glance.</p>
+            </div>
+            <span class="chip"><span class="live-dot"></span>Overview</span>
+        </div>
+        <div class="stats">
+            <div class="stat"><span>Today</span><strong>{{ stats.today }}</strong></div>
+            <div class="stat"><span>All visits</span><strong>{{ stats.total }}</strong></div>
+            <div class="stat"><span>Avg wait (min)</span><strong>{{ stats.avg_wait }}</strong></div>
+            <div class="stat"><span>No-show rate</span><strong>{{ stats.no_show_rate }}%</strong></div>
+        </div>
+        <div class="chart-grid">
+            <section class="card wide"><h2>Patients per day</h2><canvas id="dayChart"></canvas></section>
+            <section class="card"><h2>By department</h2><canvas id="deptChart"></canvas></section>
+            <section class="card"><h2>By doctor</h2><canvas id="doctorChart"></canvas></section>
+        </div>
+    </main>
+    <script>
+        const data = {{ chart | tojson }};
+
+        Chart.defaults.font.family = '"Outfit", "Segoe UI", sans-serif';
+        Chart.defaults.color = "#8b93a7";
+        Chart.defaults.borderColor = "rgba(255,255,255,0.06)";
+
+        const common = { responsive: true, plugins: { legend: { display: false } } };
+        const rounded = { borderRadius: 999, borderSkipped: false, maxBarThickness: 34 };
+
+        const ctx = document.getElementById("dayChart").getContext("2d");
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, "#ff9248");
+        grad.addColorStop(1, "#ff5a0a");
+
+        new Chart(document.getElementById("dayChart"), {
+            type: "bar",
+            data: { labels: data.days, datasets: [{ data: data.patients, backgroundColor: grad, ...rounded }] },
+            options: { ...common, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, border: { display: false } } } }
+        });
+        new Chart(document.getElementById("deptChart"), {
+            type: "doughnut",
+            data: { labels: data.departments, datasets: [{ data: data.departmentCounts, backgroundColor: ["#7c5cff", "#22c55e", "#ff6a1a", "#38bdf8", "#f43f5e"], borderColor: "rgba(11,13,20,0.9)", borderWidth: 4, hoverOffset: 8 }] },
+            options: { responsive: true, cutout: "68%", plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8, padding: 16 } } } }
+        });
+        new Chart(document.getElementById("doctorChart"), {
+            type: "bar",
+            data: { labels: data.doctors, datasets: [{ data: data.doctorCounts, backgroundColor: "#7c5cff", ...rounded }] },
+            options: { ...common, indexAxis: "y", scales: { x: { beginAtZero: true, border: { display: false } }, y: { grid: { display: false } } } }
+        });
+    </script>
+</body>
+</html>

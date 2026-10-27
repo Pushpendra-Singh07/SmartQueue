@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>SmartQueue – Doctor</div>
+        <div class="nav-links">
+            <a href="/doctor/queue">Live Queue</a>
+            <a class="active" href="/doctor/history">Patient History</a>
+        </div>
+        <div class="nav-user"><span class="avatar">{{ (user.full_name or "?")[:1]|upper }}</span><span class="user-name">{{ user.full_name }}</span> <a class="btn btn-sm" href="/logout">Logout</a></div>
+    </nav>
+    <main class="container">
+        <div class="page-head">
+            <div>
+                <h1>Patient history</h1>
+                <p>Search past visits by name, contact or token.</p>
+            </div>
+        </div>
+        <form class="search-box" method="get" action="/doctor/history">
+            <input name="q" value="{{ query }}" placeholder="Name, contact, or token">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+        {% if query and not visits %}
+        <p class="placeholder">No visits matched “{{ query }}”.</p>
+        {% endif %}
+        {% if visits %}
+        <div class="card table-card"><div class="table-wrap">
+            <table class="data">
+                <thead><tr><th>Token</th><th>Patient</th><th>Contact</th><th>Priority</th><th>Status</th><th class="end">Checked in</th></tr></thead>
+                <tbody>
+                    {% for visit in visits %}
+                    <tr>
+                        <td><span class="token" style="margin:0">{{ visit.token_no }}</span></td>
+                        <td><strong>{{ visit.patient.name }}</strong><span class="sub">{{ visit.patient.age }}y</span></td>
+                        <td>{{ visit.patient.contact or "no contact" }}</td>
+                        <td><span class="badge" data-tone="{{ visit.priority.value|lower }}">{{ visit.priority.value }}</span></td>
+                        <td><span class="badge" data-status="{{ visit.status.value|lower }}">{{ visit.status.value }}</span></td>
+                        <td class="end num">{{ visit.check_in_time.strftime("%d %b %Y %H:%M") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+        {% endif %}
+    </main>
+</body>
+</html>

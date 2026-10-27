@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>SmartQueue – Admin</div>
+        <div class="nav-links">
+            <a href="/admin/dashboard">Dashboard</a>
+            <a class="active" href="/admin/doctors">Doctors</a>
+            <a href="/admin/staff">Staff</a>
+            <a href="/admin/departments">Departments</a>
+        </div>
+        <div class="nav-user"><span class="avatar">{{ (user.full_name or "?")[:1]|upper }}</span><span class="user-name">{{ user.full_name }}</span> <a class="btn btn-sm" href="/logout">Logout</a></div>
+    </nav>
+    <main class="container split">
+        <section>
+            <div class="page-head">
+                <div>
+                    <h1>Doctors</h1>
+                    <p>Manage doctor accounts and availability.</p>
+                </div>
+            </div>
+            {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+            <div class="card table-card"><div class="table-wrap">
+                <table class="data">
+                    <thead><tr><th>Doctor</th><th>Department</th><th>Status</th><th class="end">Action</th></tr></thead>
+                    <tbody>
+                        {% for doctor in doctors %}
+                        <tr>
+                            <td>
+                                <div class="person">
+                                    <span class="avatar">{{ doctor.name[:1]|upper }}</span>
+                                    <div><strong>{{ doctor.name }}</strong><span class="sub">{{ doctor.user.username }}</span></div>
+                                </div>
+                            </td>
+                            <td>{{ doctor.department.name }}</td>
+                            <td><span class="badge" data-tone="{{ 'ok' if doctor.is_available else 'off' }}">{{ "Available" if doctor.is_available else "Unavailable" }}</span></td>
+                            <td class="end">
+                                <form class="inline-form" method="post" action="/admin/doctors/{{ doctor.id }}/availability">
+                                    <button class="btn btn-sm" type="submit">{{ "Mark unavailable" if doctor.is_available else "Mark available" }}</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td class="empty" colspan="4">No doctors yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div></div>
+        </section>
+        <form class="card" method="post" action="/admin/doctors">
+            <h2>Add doctor</h2>
+            <div class="form-group"><label>Full name</label><input name="full_name" required></div>
+            <div class="form-group"><label>Username</label><input name="username" required></div>
+            <div class="form-group"><label>Password</label><input name="password" type="password" minlength="6" required></div>
+            <div class="form-group">
+                <label>Department</label>
+                <select name="department_id" required>
+                    <option value="">Select</option>
+                    {% for department in departments %}
+                    <option value="{{ department.id }}">{{ department.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Create doctor</button>
+        </form>
+    </main>
+</body>
+</html>

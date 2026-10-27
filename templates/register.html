@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Patient</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>SmartQueue – Staff</div>
+        <div class="nav-links">
+            <a class="active" href="/staff/register">Register Patient</a>
+            <a href="/staff/queue">View Queue</a>
+        </div>
+        <div class="nav-user"><span class="avatar">{{ (user.full_name or "?")[:1]|upper }}</span><span class="user-name">{{ user.full_name }}</span> <a class="btn btn-sm" href="/logout">Logout</a></div>
+    </nav>
+    <main class="container split">
+        <section>
+            <div class="page-head">
+                <div>
+                    <h1>Register patient</h1>
+                    <p>Create a visit and generate a queue token.</p>
+                </div>
+            </div>
+            {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+            {% if token %}<div class="alert alert-ok">Token generated: <strong>{{ token }}</strong></div>{% endif %}
+            <form class="card" method="post" action="/staff/register">
+                <div class="form-group"><label>Patient name</label><input name="name" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Age</label><input name="age" type="number" min="0" max="150" required></div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="">Select</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Contact</label><input name="contact"></div>
+                <div class="form-group">
+                    <label>Doctor</label>
+                    <select name="doctor_id" required>
+                        <option value="">Select</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.name }} · {{ doctor.department.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        <option value="Normal">Normal</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Generate token</button>
+            </form>
+        </section>
+        <section>
+            <div class="page-head"><h2 style="margin:0">Latest tokens</h2></div>
+            {% for item in recent %}
+            <div class="queue-item{% if item.priority.value == 'Emergency' %} emergency{% endif %}">
+                <div>
+                    <div class="token">{{ item.token_no }}</div>
+                    <div>{{ item.patient.name }} · {{ item.doctor.name }}</div>
+                    <small>{{ item.priority.value }} · {{ item.status.value }}</small>
+                </div>
+            </div>
+            {% else %}
+            <p class="placeholder">No tokens yet.</p>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>
