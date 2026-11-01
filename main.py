@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env", override=False)
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,8 +14,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from database import Base, engine
 from routers import admin_routes, auth_routes, doctor_routes, queue_api, staff_routes
 
-BASE_DIR = Path(__file__).resolve().parent
-load_dotenv(BASE_DIR / ".env")
+Base.metadata.create_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="MEDIFLOW")
